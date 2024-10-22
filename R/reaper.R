@@ -36,9 +36,8 @@
 reaper <- function(file, f0min=40, f0max=500, interval=0.005,
                    hilbert=FALSE, suppress_highpass_filter=FALSE,
                    unvoiced_cost=0.9, output = c('pitch', 'epochs')) {
-  exePath <- file.path(system.file(package = 'reapeR'),
-                       'bin/reaper')
-  if (Sys.info()['sysname'] == 'Windows') exePath <- paste0(exePath, '.exe')
+  exePath <- list.files(file.path(system.file(package = 'reapeR'),
+                                  'bin'), recursive = TRUE)
   exePath <- paste0('"', exePath, '"')
   fileSafe <- paste0('"', file, '"')
 
