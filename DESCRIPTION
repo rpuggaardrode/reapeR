@@ -12,3 +12,5 @@ LazyData: true
 Imports: readr
 RoxygenNote: 7.2.3
 License: Apache License (>= 2)
+URL: https://github.com/rpuggaardrode/reapeR
+BugReports: https://github.com/rpuggaardrode/reapeR/issues
