@@ -16,6 +16,10 @@
 #' @param output String or vector of strings specifying which estimates to
 #' output. Possible values are `pitch` and `epochs`, default is to output
 #' both.
+#' @param exePath String giving the location of your REAPER executable. Default
+#' is `NULL`, which should work if REAPER was successfully installed with the
+#' installation of this R package. If it wasn't, but you have REAPER installed
+#' somewhere else, you can specify the path of the executable here.
 #'
 #' @return If `output = 'pitch'`, returns a data frame with four columns:
 #' * `time`, giving the frame time in seconds
@@ -35,9 +39,13 @@
 #' vals <- reaper(snd)
 reaper <- function(file, f0min=40, f0max=500, interval=0.005,
                    hilbert=FALSE, suppress_highpass_filter=FALSE,
-                   unvoiced_cost=0.9, output = c('pitch', 'epochs')) {
-  exePath <- list.files(file.path(system.file(package = 'reapeR'),
-                                  'bin'), recursive = TRUE, full.names = TRUE)
+                   unvoiced_cost=0.9, output = c('pitch', 'epochs'),
+                   exePath = NULL) {
+
+  if (is.null(exePath)) exePath <- list.files(
+    file.path(system.file(package = 'reapeR'),
+              'bin'), recursive = TRUE, full.names = TRUE)
+
   exePath <- paste0('"', exePath, '"')
   fileSafe <- paste0('"', file, '"')
 
