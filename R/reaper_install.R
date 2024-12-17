@@ -13,7 +13,7 @@
 reaper_install <- function() {
   curwd <- getwd()
   on.exit(setwd(curwd))
-  dest <- paste0(system.file('bin', package='reapeR'))
+  dest <- file.path(system.file(package = 'reapeR'), 'bin')
   if (dir.exists(dest)) stop('REAPER already installed')
   dir.create(dest, recursive = TRUE, showWarnings = FALSE)
   setwd(dest)
