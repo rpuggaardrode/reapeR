@@ -18,6 +18,10 @@
 #' (Floor = 0.75 Q1, ceiling = 1.5 Q3). If `directory` refers to an EMU database
 #' with multiple sessions, the two-pass procedure is run separately for each
 #' session.
+#' @param praat_output Boolean; should REAPER output be stored as a Praat
+#' `.Pitch` file? Default is `FALSE`.
+#' @param praat_output_dir String giving the location of a directory where
+#' Praat `.Pitch` files should be stored. Default is `NULL`.
 #' @param ... Further arguments passed on to `reaper()`.
 #'
 #' @return If `output = 'pitch'`, returns a data frame with four columns:
@@ -40,7 +44,8 @@
 #' dir <- file.path(system.file('extdata', package = 'reapeR'))
 #' vals <- reaper(dir)
 reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
-                        f0min = 40, f0max = 500, hirst2pass = FALSE, ...) {
+                        f0min = 40, f0max = 500, hirst2pass = FALSE,
+                        praat_output = FALSE, praat_output_dir = NULL, ...) {
 
   if (class(directory) == 'emuDBhandle') {
     bndls <- emuR::list_bundles(directory)
@@ -75,8 +80,12 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
         if (length(output) == 2) {
           pitch <- rbind(pitch, out$pitch)
           epochs <- c(epochs, out$epochs)
+          if (praat_output) write_praat_pitch(out$pitch, praat_output_dir,
+                                              gsub('.*/', '', gsub('.wav', '', f)))
         } else if (output == 'pitch') {
           pitch <- rbind(pitch, out)
+          if (praat_output) write_praat_pitch(out, praat_output_dir,
+                                              gsub('.*/', '', gsub('.wav', '', f)))
         } else {
           epochs <- c(epochs, out)
         }
@@ -97,8 +106,12 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
         if (length(output) == 2) {
           pitch <- rbind(pitch, out$pitch)
           epochs <- c(epochs, out$epochs)
+          if (praat_output) write_praat_pitch(out$pitch, praat_output_dir,
+                                              gsub('.*/', '', gsub('.wav', '', f)))
         } else if (output == 'pitch') {
           pitch <- rbind(pitch, out)
+          if (praat_output) write_praat_pitch(out, praat_output_dir,
+                                              gsub('.*/', '', gsub('.wav', '', f)))
         } else {
           epochs <- c(epochs, out)
         }

@@ -10,6 +10,8 @@ reaper_bulk(
   f0min = 40,
   f0max = 500,
   hirst2pass = FALSE,
+  praat_output = FALSE,
+  praat_output_dir = NULL,
   ...
 )
 }
@@ -33,6 +35,12 @@ values estimated from the first and third quantiles of the first pass.
 (Floor = 0.75 Q1, ceiling = 1.5 Q3). If `directory` refers to an EMU database
 with multiple sessions, the two-pass procedure is run separately for each
 session.}
+
+\item{praat_output}{Boolean; should REAPER output be stored as a Praat
+`.Pitch` file? Default is `FALSE`.}
+
+\item{praat_output_dir}{String giving the location of a directory where
+Praat `.Pitch` files should be stored. Default is `NULL`.}
 
 \item{...}{Further arguments passed on to `reaper()`.}
 }
