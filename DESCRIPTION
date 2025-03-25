@@ -1,7 +1,7 @@
 Package: reapeR
 Type: Package
 Title: Robust Epoch and Pitch Estimation in R
-Version: 0.0.4
+Version: 0.0.5
 Authors@R: 
   person("Rasmus", "Puggaard-Rode",
   email = "r.puggaard@phonetik.uni-muenchen.de",
