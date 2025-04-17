@@ -49,7 +49,7 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
 
   if (class(directory) == 'emuDBhandle') {
     bndls <- emuR::list_bundles(directory)
-    wavs <- paste0(db$basePath, '/', bndls$session, '_ses/',
+    wavs <- paste0(directory$basePath, '/', bndls$session, '_ses/',
                    bndls$name, '_bndl/', bndls$name, '.wav')
     bndls$file <- wavs
     ses <- unique(bndls$session)
