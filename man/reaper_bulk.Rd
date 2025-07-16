@@ -66,5 +66,5 @@ in a directory
 }
 \examples{
 dir <- file.path(system.file('extdata', package = 'reapeR'))
-vals <- reaper(dir)
+vals <- reaper_bulk(dir)
 }

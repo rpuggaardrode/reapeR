@@ -42,7 +42,7 @@
 #'
 #' @examples
 #' dir <- file.path(system.file('extdata', package = 'reapeR'))
-#' vals <- reaper(dir)
+#' vals <- reaper_bulk(dir)
 reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
                         f0min = 40, f0max = 500, hirst2pass = FALSE,
                         praat_output = FALSE, praat_output_dir = NULL, ...) {
@@ -98,7 +98,7 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
       } else {
         pass1 <- out$f0
       }
-      q <- quantile(pass1, probs=c(0.25, 0.75), na.rm=T, names=F)
+      q <- stats::quantile(pass1, probs=c(0.25, 0.75), na.rm=T, names=F)
       f0min <- 0.75*q[1]
       f0max <- 1.5*q[2]
       for (f in fls) {
