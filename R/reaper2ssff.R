@@ -43,12 +43,12 @@ reaper2ssff <- function(reaper_output, db_handle) {
       wrassp::write.AsspDataObj(ado, file=new_path)
     }
 
-    emuR::add_files(db, paste0(getwd(), '/ssff/', s), 'reaper', s)
+    emuR::add_files(db_handle, paste0(getwd(), '/ssff/', s), 'reaper', s)
 
   }
 
-  emuR::add_ssffTrackDefinition(db, 'rF0', 'rF0', 'reaper')
-  emuR::add_ssffTrackDefinition(db, 'vd', 'vd', 'reaper')
+  emuR::add_ssffTrackDefinition(db_handle, 'rF0', 'rF0', 'reaper')
+  emuR::add_ssffTrackDefinition(db_handle, 'vd', 'vd', 'reaper')
   unlink('ssff', recursive=T)
 
 }
