@@ -40,7 +40,7 @@
 reaper <- function(file, f0min=40, f0max=500, interval=0.005,
                    hilbert=FALSE, suppress_highpass_filter=FALSE,
                    unvoiced_cost=0.9, output = c('pitch', 'epochs'),
-                   exePath = NULL) {
+                   verbose = TRUE, exePath = NULL) {
 
   if (is.null(exePath)) exePath <- list.files(
     file.path(system.file(package = 'reapeR'),
@@ -55,7 +55,8 @@ reaper <- function(file, f0min=40, f0max=500, interval=0.005,
   if (suppress_highpass_filter) call <- paste(call, '-s')
   if ('pitch' %in% output) call <- paste(call, '-f f0out')
   if ('epochs' %in% output) call <- paste(call, '-p pmout')
-  system(call)
+  system(call, ignore.stdout = TRUE)
+  if (verbose) print(paste(file, 'processed!'))
 
   if ('pitch' %in% output) f0est <- read_pitch_out('f0out', file, TRUE)
   if ('epochs' %in% output) epochs <- read_epochs_out('pmout', file, TRUE)

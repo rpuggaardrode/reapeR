@@ -19,8 +19,12 @@
 #' path <- file.path(system.file(package = 'reapeR'), 'extdata', 'epochs')
 #' epochs <- read_epochs_out(path)
 read_epochs_out <- function(epochsFile, audioFile = NULL, delete = FALSE) {
+  if (!file.exists(epochsFile)) stop(paste(
+    'Epoch output file not found, probably because something went wrong during',
+    'the installation of REAPER'))
   pm_file <- readr::read_file(epochsFile)
   if (delete) unlink(epochsFile)
+  pm_file <- gsub('\r', '', pm_file)
   pmest <- unlist(strsplit(pm_file, 'EST_Header_End\\n'))[2]
   pmest <- suppressMessages(readr::read_delim(pmest))
   colnames(pmest) <- c('time', 'voiced', 'x')

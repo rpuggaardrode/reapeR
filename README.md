@@ -38,13 +38,24 @@ You can install the development version of `reapeR` from
 devtools::install_github('rpuggaardrode/reapeR')
 ```
 
-This should also install REAPER along with the R package. If this does
-not work for some reason, you can try again with the `reaper_install()`
-function.
+This should also install REAPER along with the R package. If this works
+as intended, you should see a bunch of progress messages in the R
+console ending with the message `[100%] Built target reaper`. If this
+does *not* work for some reason, you can try again with the
+`reaper_install()` function.
 
 ``` r
 reapeR::reaper_install()
 ```
+
+If REAPER is *still* not installed, this could be because either
+[Git](https://github.com/git-guides/install-git) or
+[CMake](https://cmake.org/download/) are not available on your machine.
+They are required for the installation to work. Getting CMake set up
+right can be a bit of a hassle – if you are on a Mac, the preferred way
+to install CMake is by running the following code from the terminal:
+
+`brew install cmake`
 
 ## Running REAPER from R
 
@@ -55,6 +66,7 @@ a single argument with the name of a sound file.
 ``` r
 library(reapeR)
 reaper_out <- reaper('inst/extdata/1.wav')
+#> [1] "inst/extdata/1.wav processed!"
 ```
 
 The resulting object, `reaper_out`, is a `list` containing two elements
@@ -138,6 +150,8 @@ directory instead of the path to a sound file:
 
 ``` r
 reaper_output <- reaper_bulk('inst/extdata')
+#> [1] "inst/extdata/1.wav processed!"
+#> [1] "inst/extdata/2.wav processed!"
 ```
 
 `reaper_bulk()` has a few more interesting options.
