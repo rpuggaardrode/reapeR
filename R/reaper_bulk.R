@@ -53,6 +53,12 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
                    bndls$name, '_bndl/', bndls$name, '.wav')
     bndls$file <- wavs
     ses <- unique(bndls$session)
+    if (praat_output) {
+      dirStructure <- list.dirs(directory$basePath, recursive = TRUE,
+                                full.names = FALSE)[-1]
+      for (d in 1:length(dirStructure)) dir.create(
+        file.path(praat_output_dir, dirStructure[d]))
+    }
   } else {
     wavs <- paste0(directory, '/', list.files(directory, pattern='*.wav'))
     ses <- 'dummy'
@@ -80,12 +86,28 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
         if (length(output) == 2) {
           pitch <- rbind(pitch, out$pitch)
           epochs <- c(epochs, out$epochs)
-          if (praat_output) write_praat_pitch(out$pitch, praat_output_dir,
-                                              gsub('.*/', '', gsub('.wav', '', f)))
+          if (praat_output) {
+            if (class(directory) == 'emuDBhandle') {
+              write_praat_pitch(out$pitch, praat_output_dir,
+                                gsub('.*emuDB/', praat_output_dir,
+                                     gsub('.wav', '', f)))
+            } else {
+              write_praat_pitch(out$pitch, praat_output_dir,
+                                gsub('.*/', '', gsub('.wav', '', f)))
+            }
+          }
         } else if (output == 'pitch') {
           pitch <- rbind(pitch, out)
-          if (praat_output) write_praat_pitch(out, praat_output_dir,
-                                              gsub('.*/', '', gsub('.wav', '', f)))
+          if (praat_output) {
+            if (class(directory) == 'emuDBhandle') {
+              write_praat_pitch(out, praat_output_dir,
+                                gsub('.*emuDB', '',
+                                     gsub('.wav', '', f)))
+            } else {
+              write_praat_pitch(out, praat_output_dir,
+                                gsub('.*/', '', gsub('.wav', '', f)))
+            }
+          }
         } else {
           epochs <- c(epochs, out)
         }
@@ -106,12 +128,28 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
         if (length(output) == 2) {
           pitch <- rbind(pitch, out$pitch)
           epochs <- c(epochs, out$epochs)
-          if (praat_output) write_praat_pitch(out$pitch, praat_output_dir,
-                                              gsub('.*/', '', gsub('.wav', '', f)))
+          if (praat_output) {
+            if (class(directory) == 'emuDBhandle') {
+              write_praat_pitch(out$pitch, praat_output_dir,
+                                gsub('.*emuDB/', praat_output_dir,
+                                     gsub('.wav', '', f)))
+            } else {
+              write_praat_pitch(out$pitch, praat_output_dir,
+                                gsub('.*/', '', gsub('.wav', '', f)))
+            }
+          }
         } else if (output == 'pitch') {
           pitch <- rbind(pitch, out)
-          if (praat_output) write_praat_pitch(out, praat_output_dir,
-                                              gsub('.*/', '', gsub('.wav', '', f)))
+          if (praat_output) {
+            if (class(directory) == 'emuDBhandle') {
+              write_praat_pitch(out, praat_output_dir,
+                                gsub('.*emuDB/', '',
+                                     gsub('.wav', '', f)))
+            } else {
+              write_praat_pitch(out, praat_output_dir,
+                                gsub('.*/', '', gsub('.wav', '', f)))
+            }
+          }
         } else {
           epochs <- c(epochs, out)
         }
