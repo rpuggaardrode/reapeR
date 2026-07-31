@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^README\.Rmd$
+^src/.*\.o$
+^cran-comments\.md$
+^CRAN-SUBMISSION$

@@ -2,22 +2,23 @@
 % Please edit documentation in R/reaper2ssff.R
 \name{reaper2ssff}
 \alias{reaper2ssff}
-\title{Convert REAPER output to SSFF files and import to EMU database}
+\title{Convert REAPER output to SSFF format}
 \usage{
-reaper2ssff(reaper_output, db_handle)
+reaper2ssff(reaper_output)
 }
 \arguments{
-\item{reaper_output}{Data frame or list object created with the
-`reaper_bulk()` function.}
-
-\item{db_handle}{Handle of a loaded EMU database}
+\item{reaper_output}{Output from [reaper] containing pitch measures.}
 }
 \value{
-Nothing; run for side effects.
+An object of class `AsspDataObj`.
 }
 \description{
-Convert REAPER output to SSFF files and import to EMU database
+Convert REAPER output for a single file to Simple Signal File Format data.
+Usually used by [reaper2emuDB], but may also be used as a stand-alone for
+e.g. plotting REAPER pitch data with `praatpicture`.
 }
 \examples{
-# not now
+snd <- file.path(system.file('extdata', package = 'reapeR'), '1.wav')
+vals <- reaper(snd)
+ssffObj <- reaper2ssff(vals)
 }

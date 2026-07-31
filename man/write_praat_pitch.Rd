@@ -25,8 +25,11 @@ Praat.
 }
 \examples{
 \dontrun{
-path <- file.path(system.file(package = 'reapeR'), 'extdata', 'pitch')
-pitch <- read_pitch_out(path)
-write_praat_pitch(pitch, path, 'test')
+snd <- file.path(system.file('extdata', package = 'reapeR'), '1.wav')
+pit <- reaper(snd, output = 'pitch')
+out_path <- file.path(tempdir(), 'pit.Pitch')
+file.exists(out_path)
+write_praat_pitch(pit, tempdir(), 'pit')
+file.exists(out_path)
 }
 }

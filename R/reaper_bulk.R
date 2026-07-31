@@ -47,7 +47,7 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
                         f0min = 40, f0max = 500, hirst2pass = FALSE,
                         praat_output = FALSE, praat_output_dir = NULL, ...) {
 
-  if (class(directory) == 'emuDBhandle') {
+  if (inherits(directory, 'emuDBhandle')) {
     bndls <- emuR::list_bundles(directory)
     wavs <- paste0(directory$basePath, '/', bndls$session, '_ses/',
                    bndls$name, '_bndl/', bndls$name, '.wav')
@@ -74,7 +74,7 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
   }
 
   for (s in ses) {
-    if (class(directory) == 'emuDBhandle') {
+    if (inherits(directory, 'emuDBhandle')) {
       fls <- bndls[which(bndls$session == s),]$file
     } else {
       fls <- wavs
@@ -87,7 +87,7 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
           pitch <- rbind(pitch, out$pitch)
           epochs <- c(epochs, out$epochs)
           if (praat_output) {
-            if (class(directory) == 'emuDBhandle') {
+            if (inherits(directory, 'emuDBhandle')) {
               write_praat_pitch(out$pitch, praat_output_dir,
                                 gsub('.*emuDB/', praat_output_dir,
                                      gsub('.wav', '', f)))
@@ -99,7 +99,7 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
         } else if (output == 'pitch') {
           pitch <- rbind(pitch, out)
           if (praat_output) {
-            if (class(directory) == 'emuDBhandle') {
+            if (inherits(directory, 'emuDBhandle')) {
               write_praat_pitch(out, praat_output_dir,
                                 gsub('.*emuDB', '',
                                      gsub('.wav', '', f)))
@@ -129,7 +129,7 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
           pitch <- rbind(pitch, out$pitch)
           epochs <- c(epochs, out$epochs)
           if (praat_output) {
-            if (class(directory) == 'emuDBhandle') {
+            if (inherits(directory, 'emuDBhandle')) {
               write_praat_pitch(out$pitch, praat_output_dir,
                                 gsub('.*emuDB/', praat_output_dir,
                                      gsub('.wav', '', f)))
@@ -141,7 +141,7 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
         } else if (output == 'pitch') {
           pitch <- rbind(pitch, out)
           if (praat_output) {
-            if (class(directory) == 'emuDBhandle') {
+            if (inherits(directory, 'emuDBhandle')) {
               write_praat_pitch(out, praat_output_dir,
                                 gsub('.*emuDB/', '',
                                      gsub('.wav', '', f)))
@@ -158,7 +158,7 @@ reaper_bulk <- function(directory, output = c('pitch', 'epochs'),
   }
 
   if ('pitch' %in% output) pitch <- pitch[-1,]
-  if (class(directory) == 'emuDBhandle') pitch <- dplyr::left_join(
+  if (inherits(directory, 'emuDBhandle')) pitch <- dplyr::left_join(
     pitch, bndls, by='file')
 
   if (length(output) == 2) {

@@ -11,10 +11,10 @@ write_praat_epochs(reaper_out, directory, filename)
 [read_epochs_out] or created with [reaper].}
 
 \item{directory}{String giving the location to use for storing the resulting
-`.Pitch` file.}
+`.PointProcess` file.}
 
 \item{filename}{String giving the file name of the resulting file (note that
-the `.Pitch` extension is added automatically).}
+the `.PointProcess` extension is added automatically).}
 }
 \value{
 Used for side effects.
@@ -25,8 +25,11 @@ that can be read by Praat.
 }
 \examples{
 \dontrun{
-path <- file.path(system.file(package = 'reapeR'), 'extdata', 'epochs')
-epo <- read_epochs_out(path)
-write_praat_epochs(pitch, epo, 'test')
+snd <- file.path(system.file('extdata', package = 'reapeR'), '1.wav')
+epo <- reaper(snd, output = 'epochs')
+out_path <- file.path(tempdir(), 'epo.PointProcess')
+file.exists(out_path)
+write_praat_epochs(epo, tempdir(), 'epo')
+file.exists(out_path)
 }
 }

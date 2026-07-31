@@ -1,54 +1,37 @@
-#' Convert REAPER output to SSFF files and import to EMU database
+#' Convert REAPER output to SSFF format
 #'
+#' Convert REAPER output for a single file to Simple Signal File Format data.
+#' Usually used by [reaper2emuDB], but may also be used as a stand-alone for
+#' e.g. plotting REAPER pitch data with `praatpicture`.
 #'
-#' @param reaper_output Data frame or list object created with the
-#' `reaper_bulk()` function.
-#' @param db_handle Handle of a loaded EMU database
+#' @param reaper_output Output from [reaper] containing pitch measures.
 #'
-#' @return Nothing; run for side effects.
+#' @returns An object of class `AsspDataObj`.
 #' @export
 #'
 #' @examples
-#' # not now
-reaper2ssff <- function(reaper_output, db_handle) {
-
+#' snd <- file.path(system.file('extdata', package = 'reapeR'), '1.wav')
+#' vals <- reaper(snd)
+#' ssffObj <- reaper2ssff(vals)
+reaper2ssff <- function(reaper_output) {
   if (!is.data.frame(reaper_output)) reaper_output <- reaper_output$pitch
+  if (length(unique(reaper_output$file)) > 1) stop(
+    'Output should come from only file')
+
+  start <- reaper_output$time[1]
   sr <- round(1 / (reaper_output[[2,'time']] - reaper_output[[1,'time']]), 0)
 
-  dir.create(paste0(getwd(), '/ssff/'))
-  sessions <- unique(reaper_output$session)
-
-  for (s in sessions) {
-    dir.create(paste0(getwd(), '/ssff/', s))
-    ssff_path <- paste0(getwd(), '/ssff/', s)
-    tmp_s <- reaper_output[which(reaper_output$session==s),]
-    fls <- unique(tmp_s$name)
-
-    for (f in fls) {
-      tmp <- tmp_s[which(tmp_s$name==f),]
-      start <- tmp$time[1]
-      ado <- list()
-      attr(ado, 'sampleRate') <- sr
-      attr(ado, 'origFreq') <- 0
-      attr(ado, 'startTime') <- start
-      attr(ado, 'endRecord') <- nrow(tmp)
-      class(ado) <- 'AsspDataObj'
-      wrassp::AsspFileFormat(ado) <- 'SSFF'
-      wrassp::AsspDataFormat(ado) <- as.integer(2)
-      ado <- wrassp::addTrack(ado, 'rF0', tmp$f0, 'REAL32')
-      ado <- wrassp::addTrack(ado, 'vd', tmp$voiced, format='REAL32')
-      attr(ado, 'trackFormats') <- rep('REAL32', length(ado))
-
-      new_path <- paste0(ssff_path, '/', f, '.reaper')
-      wrassp::write.AsspDataObj(ado, file=new_path)
-    }
-
-    emuR::add_files(db_handle, paste0(getwd(), '/ssff/', s), 'reaper', s)
-
-  }
-
-  emuR::add_ssffTrackDefinition(db_handle, 'rF0', 'rF0', 'reaper')
-  emuR::add_ssffTrackDefinition(db_handle, 'vd', 'vd', 'reaper')
-  unlink('ssff', recursive=T)
-
+  ado <- list()
+  attr(ado, 'sampleRate') <- sr
+  attr(ado, 'origFreq') <- 0
+  attr(ado, 'startTime') <- start
+  attr(ado, 'startRecord') <- as.integer(1)
+  attr(ado, 'endRecord') <- nrow(reaper_output)
+  class(ado) <- 'AsspDataObj'
+  wrassp::AsspFileFormat(ado) <- 'SSFF'
+  wrassp::AsspDataFormat(ado) <- as.integer(2)
+  ado <- wrassp::addTrack(ado, 'rF0', reaper_output$f0, 'REAL32')
+  ado <- wrassp::addTrack(ado, 'vd', reaper_output$voiced, format='REAL32')
+  attr(ado, 'trackFormats') <- rep('REAL32', length(ado))
+  return(ado)
 }

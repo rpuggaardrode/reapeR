@@ -6,6 +6,9 @@
 \usage{
 reaper(
   file,
+  start = 0,
+  end = Inf,
+  channel = 1,
   f0min = 40,
   f0max = 500,
   interval = 0.005,
@@ -13,11 +16,22 @@ reaper(
   suppress_highpass_filter = FALSE,
   unvoiced_cost = 0.9,
   output = c("pitch", "epochs"),
-  exePath = NULL
+  verbose = TRUE
 )
 }
 \arguments{
-\item{file}{String giving the name of an audio file to analyze}
+\item{file}{String giving the name of a WAV file to analyze}
+
+\item{start}{Numeric value giving the analysis start time in seconds.
+When possible, the actual analysis will begin 50 ms prior to this time.
+Default is `0`.}
+
+\item{end}{Numeric value giving the analysis end time in seconds.
+When possible, the actual analysis will begin 50 ms after this time.
+Default is `Inf`.}
+
+\item{channel}{Numeric value specifying the channel to be analyzed.
+Default is `1`.}
 
 \item{f0min}{Numeric value specifying pitch floor. Default is `40`.}
 
@@ -39,10 +53,8 @@ set higher value to estimate more F0 in noise.}
 output. Possible values are `pitch` and `epochs`, default is to output
 both.}
 
-\item{exePath}{String giving the location of your REAPER executable. Default
-is `NULL`, which should work if REAPER was successfully installed with the
-installation of this R package. If it wasn't, but you have REAPER installed
-somewhere else, you can specify the path of the executable here.}
+\item{verbose}{Boolean; should messages be printed to the console?
+Default is `TRUE`.}
 }
 \value{
 If `output = 'pitch'`, returns a data frame with four columns:
@@ -58,7 +70,7 @@ If `output = c('pitch', 'epochs')`, returns a list with the above two
 outputs.
 }
 \description{
-Wrapper function to call David Talkin's REAPER software in R
+Track pitch and/or estimate epochs using David Talkin's REAPER library.
 }
 \examples{
 snd <- file.path(system.file('extdata', package = 'reapeR'), '1.wav')
