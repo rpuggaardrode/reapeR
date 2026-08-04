@@ -4,7 +4,7 @@
 \alias{read_pitch_out}
 \title{Read in REAPER pitch output file as tibble}
 \usage{
-read_pitch_out(pitchFile, audioFile = NULL, delete = FALSE)
+read_pitch_out(pitchFile, audioFile = NULL)
 }
 \arguments{
 \item{pitchFile}{String giving the file name of an ASCII pitch file
@@ -14,9 +14,6 @@ created by REAPER.}
 string is provided, a separate column will be made in the tibble repeating
 this string (practical if creating a large data frame with many of these
 files). Default is `NULL`, in which case no such column is created.}
-
-\item{delete}{Boolean; should the original REAPER output file be deleted?
-Default is `FALSE`.}
 }
 \value{
 A data frame with four columns:

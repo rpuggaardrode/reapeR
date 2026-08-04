@@ -16,7 +16,7 @@
 reaper2ssff <- function(reaper_output) {
   if (!is.data.frame(reaper_output)) reaper_output <- reaper_output$pitch
   if (length(unique(reaper_output$file)) > 1) stop(
-    'Output should come from only file')
+    'Output should come from only one file')
 
   start <- reaper_output$time[1]
   sr <- round(1 / (reaper_output[[2,'time']] - reaper_output[[1,'time']]), 0)

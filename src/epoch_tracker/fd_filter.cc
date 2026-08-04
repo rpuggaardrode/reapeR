@@ -48,8 +48,10 @@ for a test harness and use examples.
 
 #include <stdio.h>
 #include <math.h>
+#include <Rcpp.h>
 
 #include "epoch_tracker/fft.h"
+#include "epoch_tracker/epoch_tracker.h"
 
 // kIoBufferSize can be any reasonable size.
 static const int kIoBufferSize = 10000;
@@ -153,9 +155,9 @@ void FdFilter::FdFilterInitialize(float input_freq, float corner_freq,
       freq1 = input_freq;
     } else {   /* it is just a symmetric FIR */
       if (corner_freq >= (freq1 = input_freq) / 2.0) {
-        fprintf(stderr,
-                "Unreasonable corner frequency specified to filter() (%f)\n",
-                corner_freq);
+        if (r_verbose)
+          REprintf("Unreasonable corner frequency specified to filter() (%f)\n",
+                  corner_freq);
       }
     }
   }
@@ -170,11 +172,11 @@ void FdFilter::FdFilterInitialize(float input_freq, float corner_freq,
         int nItems = sscanf(line, "%d %d %f", &pow2, &n_spect, &fs);
         if ((nItems == 3) && (fs != input_freq)) {  // This should be a
                                                   // fatal error!
-          fprintf(stderr,
-                  "Filter spec (%f) does not match input frequency (%f)\n",
-                  fs, input_freq);
-          fprintf(stderr,
-               "The filtering results will probably not be what you want!\n");
+          if (r_verbose)
+            REprintf("Filter spec (%f) does not match input frequency (%f)\n",
+                    fs, input_freq);
+          if (r_verbose)
+            REprintf("The filtering results will probably not be what you want!\n");
         }
         b = new float[n_spect];
         n_filter_coeffs_ = n_spect - 1;  // n_filter_coeffs_ represents actual
@@ -185,17 +187,20 @@ void FdFilter::FdFilterInitialize(float input_freq, float corner_freq,
         for (i = 0; i < n_spect; i++) {
           if ((!fgets(line, 500, spec_stream)) ||
              (sscanf(line, "%d %f", &ind, &(b[i])) != 2)) {
-            fprintf(stderr, "Parsing error in spect ratio file %s\n",
+            if (r_verbose)
+              REprintf("Parsing error in spect ratio file %s\n",
                     spectrum_shape);
           }
         }
       } else {
-        fprintf(stderr, "Bad format in spectrum file %s\n",
-                             spectrum_shape);
+        if (r_verbose)
+          REprintf("Bad format in spectrum file %s\n",
+                              spectrum_shape);
       }
       fclose(spec_stream);
     } else {
-      fprintf(stderr, "Can't open %s as a spectrum file\n",
+      if (r_verbose)
+        REprintf("Can't open %s as a spectrum file\n",
                            spectrum_shape);
     }
   } else {
@@ -217,15 +222,10 @@ void FdFilter::FdFilterInitialize(float input_freq, float corner_freq,
         ratio_t = static_cast<float>(insert_) / decimate_;
 
         if (fabs(1.0 - ratio_t) < .01) {
-          fprintf(stderr,
-                  "Input and output frequencies are essentially equal!\n");
+          if (r_verbose)
+            REprintf("Input and output frequencies are essentially equal!\n");
         }
         true_output_rate_ = ratio_t * freq1;
-        // if (corner_freq != true_output_rate_) {
-        //   fprintf(stderr,
-        // "Warning: Output frequency obtained(%f) is not as requested(%f)\n",
-        //    true_output_rate_, corner_freq);
-        // }
         corner_freq = true_output_rate_;
         n_filter_coeffs_ = static_cast<int>(freq1 * insert_ * filter_dur) | 1;
         if (corner_freq < freq1)
@@ -517,7 +517,8 @@ int FdFilter::FilterStream(FILE *input_stream, FILE *output_stream) {
     FilterBuffer(nread*insert_, &towrite);
     if ((i = fwrite(output_buffer_, sizeof(*output_buffer_), towrite,
                     output_stream)) < towrite) {
-      fprintf(stderr, "Problems writing output in FilterStream\n");
+      if (r_verbose)
+        REprintf("Problems writing output in FilterStream\n");
       rVal = 0;
     }
     filter_state_ = 0;

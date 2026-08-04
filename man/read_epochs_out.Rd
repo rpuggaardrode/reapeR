@@ -4,7 +4,7 @@
 \alias{read_epochs_out}
 \title{Read in REAPER epochs output file as tibble}
 \usage{
-read_epochs_out(epochsFile, audioFile = NULL, delete = FALSE)
+read_epochs_out(epochsFile, audioFile = NULL)
 }
 \arguments{
 \item{epochsFile}{String giving the file name of an ASCII epochs / pitchmarks
@@ -14,9 +14,6 @@ file created by REAPER.}
 string is provided, the function will return a named list instead of a
 vector (practical if creating a large object with many of these files).
 Default is `NULL`.}
-
-\item{delete}{Boolean; should the original REAPER output file be deleted?
-Default is `FALSE`.}
 }
 \value{
 # A numeric vector of epochs, or a named list with this vector.

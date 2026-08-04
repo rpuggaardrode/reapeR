@@ -6,6 +6,8 @@
 #' @param reaper_output Data frame or list object created with the
 #' `reaper_bulk()` function run over a loaded EMU database.
 #' @param db_handle Handle of a loaded EMU database
+#' @param fileExtension String giving the desired file extension for the new
+#' SSFF files. Default is `reaper`.
 #'
 #' @return Nothing; run for side effects.
 #' @export
@@ -19,7 +21,7 @@
 #' reaper2emuDB(out, db)
 #' emuR::list_ssffTrackDefinitions(db)
 #' }
-reaper2emuDB <- function(reaper_output, db_handle) {
+reaper2emuDB <- function(reaper_output, db_handle, fileExtension = 'reaper') {
 
   if (dir.exists(file.path(tempdir(), 'ssff'))) {
     unlink(file.path(tempdir(), 'ssff'), recursive = TRUE)
@@ -44,15 +46,15 @@ reaper2emuDB <- function(reaper_output, db_handle) {
     for (f in fls) {
       tmp <- tmp_s[which(tmp_s$name==f),]
       ado <- reaper2ssff(tmp)
-      new_path <- paste0(ssff_path, '/', f, '.reaper')
+      new_path <- paste0(ssff_path, '/', f, '.', fileExtension)
       wrassp::write.AsspDataObj(ado, file=new_path)
     }
 
-    emuR::add_files(db_handle, paste0(tempdir(), '/ssff/', s), 'reaper', s)
+    emuR::add_files(db_handle, paste0(tempdir(), '/ssff/', s), fileExtension, s)
 
   }
 
-  emuR::add_ssffTrackDefinition(db_handle, 'rF0', 'rF0', 'reaper')
-  emuR::add_ssffTrackDefinition(db_handle, 'vd', 'vd', 'reaper')
+  emuR::add_ssffTrackDefinition(db_handle, 'rF0', 'rF0', fileExtension)
+  emuR::add_ssffTrackDefinition(db_handle, 'vd', 'vd', fileExtension)
 
 }

@@ -1,22 +1,24 @@
 Package: reapeR
 Type: Package
 Title: Robust Epoch and Pitch Estimation in R
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
   person("Rasmus", "Puggaard-Rode",
   email = "rasmus.puggaard-rode@ling-phil.ox.ac.uk",
   role = c("aut", "cre", "cph"))
-Description: Wrapper for David Talkin's 'Robust Epoch and Pitch EstimatoR' (REAPER) software for estimating pitch and glottal closure instants from sound files.
+Description: Wrapper for David Talkin's 'Robust Epoch and Pitch EstimatoR' (REAPER) software for estimating pitch and glottal closure instants from recordings of speech.
 Encoding: UTF-8
 LazyData: true
+Depends:
+    R (>= 3.1.0)
 Imports: 
-    dplyr,
-    emuR,
-    readr,
-    stats,
-    tuneR,
-    wrassp,
-    Rcpp
+    dplyr (>= 1.1.4),
+    emuR (>= 2.5.2),
+    readr (>= 2.1.5),
+    stats (>= 4.5.1),
+    tuneR (>= 1.4.7),
+    wrassp (>= 1.0.5),
+    Rcpp (>= 1.0.0)
 LinkingTo:
     Rcpp
 RoxygenNote: 7.3.3

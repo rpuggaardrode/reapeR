@@ -100,6 +100,23 @@ static const bool kDoHighpass = true;
 static const bool kDoHilbertTransform = false;
 static const char kDebugName[] = "";
 
+extern bool r_verbose;
+
+struct Diagnostics {
+  std::vector<float> signal;
+  std::vector<float> residual;
+  std::vector<float> norm_residual;
+  std::vector<float> bandpassed_rms;
+  std::vector<float> voice_onset_prob;
+  std::vector<float> voice_offset_prob;
+  std::vector<float> peaks_debug;
+  std::vector<float> prob_voiced;
+  std::vector<float> best_corr;
+  std::vector<float> f0_time;
+  std::vector<float> f0_diag;
+  std::vector<float> nccf;
+  std::vector<float> voiced_diag;
+};
 
 class EpochTracker {
  public:
@@ -217,6 +234,8 @@ class EpochTracker {
   // debug_name_ _ "." + extension.  If debug_name_ is empty, do nothing.
   bool WriteDebugData(const std::vector<float>& data,
                       const std::string& extension);
+
+  Diagnostics GetDiagnostics() const;
 
   // Write a collection of debugging signals to separate files with
   // various, internally-defined name extensions.  If file_base is not
@@ -473,6 +492,5 @@ class EpochTracker {
   // output of periodically-resampled data
   float endpoint_padding_;
 };
-
 
 #endif  // _EPOCH_TRACKER_H_

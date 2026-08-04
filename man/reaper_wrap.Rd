@@ -44,11 +44,8 @@ seconds of epoch pulses outside of voiced intervals? Default is `0.01`.}
 \item{verbose}{Boolean; should messages be printed to the console?}
 }
 \value{
-A list object with five elements: `epochs` gives the location
-of (voiced and unvoiced) epochs; `voicing` (same length as epochs) gives
-information about whether epochs are voiced; `f0` gives estimated pitch;
-`correlation` gives correlation between pitch estiamtes; `f0_interval`
-returns the value of `interval`.
+A named list containing all of the output from the
+`epoch_tracker` procedure.
 }
 \description{
 Low-level wrapper for calling REAPER's `epoch_tracker` procedure
@@ -57,4 +54,5 @@ Low-level wrapper for calling REAPER's `epoch_tracker` procedure
 file <- file.path(system.file('extdata', package = 'reapeR'), '1.wav')
 snd <- tuneR::readWave(file)
 results <- reaper_wrap(snd@left, snd@samp.rate)
+
 }

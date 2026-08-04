@@ -9,8 +9,6 @@
 #' string is provided, the function will return a named list instead of a
 #' vector (practical if creating a large object with many of these files).
 #' Default is `NULL`.
-#' @param delete Boolean; should the original REAPER output file be deleted?
-#' Default is `FALSE`.
 #'
 #' @return# A numeric vector of epochs, or a named list with this vector.
 #' @export
@@ -18,12 +16,10 @@
 #' @examples
 #' path <- file.path(system.file(package = 'reapeR'), 'extdata', 'epochs')
 #' epochs <- read_epochs_out(path)
-read_epochs_out <- function(epochsFile, audioFile = NULL, delete = FALSE) {
+read_epochs_out <- function(epochsFile, audioFile = NULL) {
   if (!file.exists(epochsFile)) stop(paste(
-    'Epoch output file not found, probably because something went wrong during',
-    'the installation of REAPER'))
+    'Epoch output file not found'))
   pm_file <- readr::read_file(epochsFile)
-  if (delete) unlink(epochsFile)
   pm_file <- gsub('\r', '', pm_file)
   pmest <- unlist(strsplit(pm_file, 'EST_Header_End\\n'))[2]
   pmest <- suppressMessages(readr::read_delim(pmest))

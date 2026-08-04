@@ -6,7 +6,7 @@
 \alias{reapeR-package}
 \title{reapeR: Robust Epoch and Pitch Estimation in R}
 \description{
-Wrapper for David Talkin's 'Robust Epoch and Pitch EstimatoR' (REAPER) software for estimating pitch and glottal closure instants from sound files.
+Wrapper for David Talkin's 'Robust Epoch and Pitch EstimatoR' (REAPER) software for estimating pitch and glottal closure instants from recordings of speech.
 }
 \seealso{
 Useful links:

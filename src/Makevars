@@ -1,12 +1,6 @@
 PKG_CPPFLAGS = -I.
 
 SOURCES = \
-    core/file_resource.cc \
-    core/float_matrix.cc \
-    core/track.cc \
-    wave/codec_riff.cc \
-    wave/wave.cc \
-    wave/wave_io.cc \
     epoch_tracker/fft.cc \
     epoch_tracker/fd_filter.cc \
     epoch_tracker/lpc_analyzer.cc \
@@ -15,12 +9,6 @@ SOURCES = \
     RcppExports.cpp
 
 OBJECTS = \
-    core/file_resource.o \
-    core/float_matrix.o \
-    core/track.o \
-    wave/codec_riff.o \
-    wave/wave.o \
-    wave/wave_io.o \
     epoch_tracker/fft.o \
     epoch_tracker/fd_filter.o \
     epoch_tracker/lpc_analyzer.o \

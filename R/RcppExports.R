@@ -21,17 +21,16 @@
 #' seconds of epoch pulses outside of voiced intervals? Default is `0.01`.
 #' @param verbose Boolean; should messages be printed to the console?
 #'
-#' @returns A list object with five elements: `epochs` gives the location
-#' of (voiced and unvoiced) epochs; `voicing` (same length as epochs) gives
-#' information about whether epochs are voiced; `f0` gives estimated pitch;
-#' `correlation` gives correlation between pitch estiamtes; `f0_interval`
-#' returns the value of `interval`.
+#' @returns A named list containing all of the output from the
+#' `epoch_tracker` procedure.
 #' @export
 #'
 #' @examples
 #' file <- file.path(system.file('extdata', package = 'reapeR'), '1.wav')
 #' snd <- tuneR::readWave(file)
 #' results <- reaper_wrap(snd@left, snd@samp.rate)
+#'
+
 reaper_wrap <- function(samples, sample_rate, f0min = 40.0, f0max = 500.0, suppress_highpass_filter = FALSE, hilbert = FALSE, interval = 0.005, unvoiced_cost = 0.9, unvoiced_pulse_interval = 0.01, verbose = FALSE) {
     .Call(`_reapeR_reaper_wrap`, samples, sample_rate, f0min, f0max, suppress_highpass_filter, hilbert, interval, unvoiced_cost, unvoiced_pulse_interval, verbose)
 }

@@ -24,6 +24,7 @@ limitations under the License.
 
 #include <string>
 #include <vector>
+#include <Rcpp.h>
 
 #include "epoch_tracker/fd_filter.h"
 #include "epoch_tracker/lpc_analyzer.h"
@@ -611,7 +612,8 @@ bool EpochTracker::GetBandpassedRmsSignal(const std::vector<float>& input,
   size_t frame_size = RoundUp(sample_rate * frame_dur);
   size_t n_frames = 1 + ((input.size() - frame_size) / frame_step);
   if (n_frames < 2) {
-    fprintf(stderr, "input too small (%d) in GetBandpassedRmsSignal\n",
+    if (r_verbose)
+      REprintf("input too small (%d) in GetBandpassedRmsSignal\n",
             static_cast<int>(input.size()));
     output_rms->resize(0);
     return false;
@@ -724,17 +726,20 @@ void EpochTracker::NormalizeAmplitude(const std::vector<float>& input,
 
 bool EpochTracker::ComputePolarity(int *polarity) {
   if (sample_rate_ <= 0.0) {
-    fprintf(stderr, "EpochTracker not initialized in ComputeFeatures\n");
+    if (r_verbose)
+      REprintf("EpochTracker not initialized in ComputeFeatures\n");
     return false;
   }
   if (!GetBandpassedRmsSignal(signal_, sample_rate_, min_freq_for_rms_,
                               max_freq_for_rms_, internal_frame_interval_,
                               rms_window_dur_, &bandpassed_rms_)) {
-    fprintf(stderr, "Failure in GetBandpassedRmsSignal\n");
+    if (r_verbose)
+      REprintf("Failure in GetBandpassedRmsSignal\n");
     return false;
   }
   if (!GetLpcResidual(signal_, sample_rate_, &residual_)) {
-    fprintf(stderr, "Failure in GetLpcResidual\n");
+    if (r_verbose)
+      REprintf("Failure in GetLpcResidual\n");
     return false;
   }
   float mean = 0.0;
@@ -748,26 +753,31 @@ bool EpochTracker::ComputePolarity(int *polarity) {
 
 bool EpochTracker::ComputeFeatures(void) {
   if (sample_rate_ <= 0.0) {
-    fprintf(stderr, "EpochTracker not initialized in ComputeFeatures\n");
+    if (r_verbose)
+      REprintf("EpochTracker not initialized in ComputeFeatures\n");
     return false;
   }
   if (!GetBandpassedRmsSignal(signal_, sample_rate_, min_freq_for_rms_,
                               max_freq_for_rms_, internal_frame_interval_,
                               rms_window_dur_, &bandpassed_rms_)) {
-    fprintf(stderr, "Failure in GetBandpassedRmsSignal\n");
+    if (r_verbose)
+      REprintf("Failure in GetBandpassedRmsSignal\n");
     return false;
   }
   if (!GetLpcResidual(signal_, sample_rate_, &residual_)) {
-    fprintf(stderr, "Failure in GetLpcResidual\n");
+    if (r_verbose)
+      REprintf("Failure in GetLpcResidual\n");
     return false;
   }
   n_feature_frames_ = bandpassed_rms_.size();
   float mean = 0.0;
   GetSymmetryStats(residual_, &positive_rms_, &negative_rms_, &mean);
-  fprintf(stdout, "Residual symmetry: P:%f  N:%f  MEAN:%f\n",
-	  positive_rms_, negative_rms_, mean);
+  if (r_verbose)
+    Rprintf("Residual symmetry: P:%f  N:%f  MEAN:%f\n",
+	    positive_rms_, negative_rms_, mean);
   if (positive_rms_ > negative_rms_) {
-    fprintf(stdout, "Inverting signal\n");
+    if (r_verbose)
+      Rprintf("Inverting signal\n");
     for (size_t i = 0; i < residual_.size(); ++i) {
       residual_[i] = -residual_[i];
       signal_[i] = -signal_[i];
@@ -1020,7 +1030,8 @@ void EpochTracker::DoDynamicProgramming(void) {
 
 bool EpochTracker::BacktrackAndSaveOutput(void) {
   if (resid_peaks_.size() == 0) {
-    fprintf(stderr, "Can't backtrack with no residual peaks\n");
+    if (r_verbose)
+      REprintf("Can't backtrack with no residual peaks\n");
     return false;
   }
   //  Now find the best period hypothesis at the end of the signal,
@@ -1043,7 +1054,8 @@ bool EpochTracker::BacktrackAndSaveOutput(void) {
     }
   }
   if (end == 0) {
-    fprintf(stderr, "No terminal peak found in DynamicProgramming\n");
+    if (r_verbose)
+      REprintf("No terminal peak found in DynamicProgramming\n");
     return false;
   }
   output_.clear();
@@ -1144,12 +1156,13 @@ bool EpochTracker::ResampleAndReturnResults(float resample_interval,
                                             std::vector<float>* f0,
                                             std::vector<float>* correlations) {
   if ((sample_rate_ <= 0.0) || (output_.size() == 0)) {
-    fprintf(stderr, 
-            "Un-initialized EpochTracker or no output_ in ResampleAndReturnF0\n");
+    if (r_verbose)
+      REprintf("Un-initialized EpochTracker or no output_ in ResampleAndReturnF0\n");
     return false;
   }
   if (resample_interval <= 0.0) {
-    fprintf(stderr, "resample_interval <= 0.0 in ResampleAndReturnF0\n");
+    if (r_verbose)
+      REprintf("resample_interval <= 0.0 in ResampleAndReturnF0\n");
     return false;
   }
   float last_time = (output_[0].resid_index / sample_rate_) + endpoint_padding_;
@@ -1192,64 +1205,98 @@ bool EpochTracker::WriteDebugData(const std::vector<float>& data,
   }
   std::string filename = debug_name_ + "." + extension;
   if (data.size() == 0) {
-    fprintf(stdout, "Data size==0 for %s in WriteDebugData\n",
-               filename.c_str());
+    if (r_verbose)
+      Rprintf("Data size==0 for %s in WriteDebugData\n",
+                 filename.c_str());
     return false;
   }
   FILE* out = fopen(filename.c_str(), "w");
   if (!out) {
-    fprintf(stderr, "Can't open %s for debug output\n", filename.c_str());
+    if (r_verbose)
+      REprintf("Can't open %s for debug output\n", filename.c_str());
     return false;
   }
   size_t  written = fwrite(&(data.front()), sizeof(data.front()),
                            data.size(), out);
   fclose(out);
   if (written != data.size()) {
-    fprintf(stderr, "Problems writing debug data (%d %d)\n",
-            static_cast<int>(written), static_cast<int>(data.size()));
+    if (r_verbose)
+      REprintf("Problems writing debug data (%d %d)\n",
+              static_cast<int>(written), static_cast<int>(data.size()));
     return false;
   }
   return true;
 }
 
-bool EpochTracker::WriteDiagnostics(const std::string& file_base) {
-  if (!file_base.empty()) {
-    set_debug_name(file_base);
-  }
-  WriteDebugData(signal_, "pcm");
-  WriteDebugData(residual_, "resid");
-  WriteDebugData(norm_residual_, "nresid");
-  WriteDebugData(bandpassed_rms_, "bprms");
-  WriteDebugData(voice_onset_prob_, "onsetp");
-  WriteDebugData(voice_offset_prob_, "offsetp");
-  WriteDebugData(peaks_debug_, "pvals");
-  WriteDebugData(prob_voiced_, "pvoiced");
-  // best_corr_ is only available after CreatePeriodLattice.
-  WriteDebugData(best_corr_, "bestcorr");
-  // NOTE: if WriteDiagnostics is called before the
-  // DynamicProgramming, there will be nothing in output_.
-  if ((!debug_name_.empty()) && (output_.size() > 2)) {
-    std::string pm_name = debug_name_ + ".pmlab";
-    FILE* pmfile = fopen(pm_name.c_str(), "w");
-    fprintf(pmfile, "#\n");
-    std::vector<float> f0;
+Diagnostics EpochTracker::GetDiagnostics() const {
+  Diagnostics d;
+
+  d.signal = signal_;
+  d.residual = residual_;
+  d.norm_residual = norm_residual_;
+  d.bandpassed_rms = bandpassed_rms_;
+  d.voice_onset_prob = voice_onset_prob_;
+  d.voice_offset_prob = voice_offset_prob_;
+  d.peaks_debug = peaks_debug_;
+  d.prob_voiced = prob_voiced_;
+  d.best_corr = best_corr_;
+  // Reproduce the old f0ap diagnostic output,
+  // but keep it in memory instead of writing a file.
+  if (output_.size() > 2) {
     int32_t limit = output_.size() - 1;
-    // Produce debug output in normal time order.
     for (int32_t i = limit; i >= 0; --i) {
       float time = output_[i].resid_index / sample_rate_;
-      // Note that the pulse locations of both the beginning and end
-      // of any voiced period are of interest.
-      if (output_[i].voiced || ((i < limit) && (output_[i+1].voiced))) {
-        fprintf(pmfile, "%f blue \n", time);
-      } else {
-        fprintf(pmfile, "%f red \n", time);
-      }
-      f0.push_back(time);
-      f0.push_back(output_[i].f0);
-      f0.push_back(output_[i].nccf_value);
+      d.f0_time.push_back(time);
+      d.f0_diag.push_back(output_[i].f0);
+      d.nccf.push_back(output_[i].nccf_value);
+      d.voiced_diag.push_back(
+        output_[i].voiced ||
+          ((i < limit) && output_[i + 1].voiced)
+      );
     }
-    fclose(pmfile);
-    WriteDebugData(f0, "f0ap");
   }
-  return true;
+  return d;
 }
+
+// bool EpochTracker::WriteDiagnostics(const std::string& file_base) {
+//   if (!file_base.empty()) {
+//     set_debug_name(file_base);
+//   }
+//   WriteDebugData(signal_, "pcm");
+//   WriteDebugData(residual_, "resid");
+//   WriteDebugData(norm_residual_, "nresid");
+//   WriteDebugData(bandpassed_rms_, "bprms");
+//   WriteDebugData(voice_onset_prob_, "onsetp");
+//   WriteDebugData(voice_offset_prob_, "offsetp");
+//   WriteDebugData(peaks_debug_, "pvals");
+//   WriteDebugData(prob_voiced_, "pvoiced");
+//   // best_corr_ is only available after CreatePeriodLattice.
+//   WriteDebugData(best_corr_, "bestcorr");
+//   // NOTE: if WriteDiagnostics is called before the
+//   // DynamicProgramming, there will be nothing in output_.
+//   if ((!debug_name_.empty()) && (output_.size() > 2)) {
+//     std::string pm_name = debug_name_ + ".pmlab";
+//     FILE* pmfile = fopen(pm_name.c_str(), "w");
+//     fprintf(pmfile, "#\n");
+//     std::vector<float> f0;
+//     int32_t limit = output_.size() - 1;
+//     // Produce debug output in normal time order.
+//     for (int32_t i = limit; i >= 0; --i) {
+//       float time = output_[i].resid_index / sample_rate_;
+//       // Note that the pulse locations of both the beginning and end
+//       // of any voiced period are of interest.
+//       if (output_[i].voiced || ((i < limit) && (output_[i+1].voiced))) {
+//         fprintf(pmfile, "%f blue \n", time);
+//       } else {
+//         fprintf(pmfile, "%f red \n", time);
+//       }
+//       f0.push_back(time);
+//       f0.push_back(output_[i].f0);
+//       f0.push_back(output_[i].nccf_value);
+//     }
+//     fclose(pmfile);
+//     WriteDebugData(f0, "f0ap");
+//   }
+//   return true;
+// }
+//

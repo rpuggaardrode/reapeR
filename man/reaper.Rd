@@ -16,7 +16,8 @@ reaper(
   suppress_highpass_filter = FALSE,
   unvoiced_cost = 0.9,
   output = c("pitch", "epochs"),
-  verbose = TRUE
+  force_list_output = FALSE,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -50,24 +51,31 @@ suppressed? Default is `FALSE`.}
 set higher value to estimate more F0 in noise.}
 
 \item{output}{String or vector of strings specifying which estimates to
-output. Possible values are `pitch` and `epochs`, default is to output
-both.}
+output. Default is to output `pitch` and `epochs`. Possible values are:
+* `pitch` Returning a data frame with equidistant pitch estimates at
+intervals determined by `interval`.
+* `epochs` returning a named list with a numeric vector specifying the times
+of estimated glottal closure instants.
+* `gci_cand` Returning a data frame with times that are candidate glottal
+closure instants, as well as their time, local pitch value if determined
+to be voiced, and normalized cross-correlation functions (`nccf`).
+* `probs` Returning a data frame with pseudo-probabilities of voicing,
+voicing onset, and voicing offset at regular intervals, as well as bandpassed
+(low-frequency) root-mean-squared amplitude of the signal, which is used to
+derive the pseudo-probability of voicing.
+* `resids` Returning a data frame with the original signal, linear prediction
+residuals, and linear prediction residuals normalized by local
+amplitude.}
 
-\item{verbose}{Boolean; should messages be printed to the console?
-Default is `TRUE`.}
+\item{force_list_output}{Boolean; if `TRUE`, the function returns a named
+nested list even if only one output is chosen. Default is `FALSE`.}
+
+\item{verbose}{Boolean; should diagnostic messages be printed to the console?
+Default is `FALSE`.}
 }
 \value{
-If `output = 'pitch'`, returns a data frame with four columns:
-* `time`, giving the frame time in seconds
-* `voiced` Boolean specifying whether that frame is `voiced`
-* `f0` F0 in Hz
-* `file` String giving the name of the analyzed file.
-
-If `output = 'epochs'`, returns a numeric vector of epochs, or glottal
-closure instants.
-
-If `output = c('pitch', 'epochs')`, returns a list with the above two
-outputs.
+Depending on the value of `output`, either a nested list of outputs,
+a data frame, or a numeric vector.
 }
 \description{
 Track pitch and/or estimate epochs using David Talkin's REAPER library.

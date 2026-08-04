@@ -8,8 +8,6 @@
 #' string is provided, a separate column will be made in the tibble repeating
 #' this string (practical if creating a large data frame with many of these
 #' files). Default is `NULL`, in which case no such column is created.
-#' @param delete Boolean; should the original REAPER output file be deleted?
-#' Default is `FALSE`.
 #'
 #' @return A data frame with four columns:
 #' * `time`, giving the frame time in seconds
@@ -21,12 +19,9 @@
 #' @examples
 #' path <- file.path(system.file(package = 'reapeR'), 'extdata', 'pitch')
 #' pitch <- read_pitch_out(path)
-read_pitch_out <- function(pitchFile, audioFile = NULL, delete = FALSE) {
-  if (!file.exists(pitchFile)) stop(paste(
-    'Pitch output file not found, probably because something went wrong during',
-    'the installation of REAPER'))
+read_pitch_out <- function(pitchFile, audioFile = NULL) {
+  if (!file.exists(pitchFile)) stop('Pitch output file not found')
   f0_file <- readr::read_file(pitchFile)
-  if (delete) unlink(pitchFile)
   f0_file <- gsub('\r', '', f0_file)
   f0est <- unlist(strsplit(f0_file, 'EST_Header_End\\n'))[2]
   f0est <- suppressMessages(readr::read_delim(f0est))

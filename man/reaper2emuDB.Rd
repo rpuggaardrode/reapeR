@@ -4,13 +4,16 @@
 \alias{reaper2emuDB}
 \title{Import REAPER output to an EMU database as SSFF files}
 \usage{
-reaper2emuDB(reaper_output, db_handle)
+reaper2emuDB(reaper_output, db_handle, fileExtension = "reaper")
 }
 \arguments{
 \item{reaper_output}{Data frame or list object created with the
 `reaper_bulk()` function run over a loaded EMU database.}
 
 \item{db_handle}{Handle of a loaded EMU database}
+
+\item{fileExtension}{String giving the desired file extension for the new
+SSFF files. Default is `reaper`.}
 }
 \value{
 Nothing; run for side effects.

@@ -21,13 +21,15 @@
 //' @returns A list object with five elements: `epochs` gives the location
 //' of (voiced and unvoiced) epochs; `voicing` (same length as epochs) gives
 //' information about whether epochs are voiced; `f0` gives estimated pitch;
-//' `correlation` gives correlation between pitch estiamtes; `f0_interval`
+//' `correlation` gives correlation between pitch estimates; `f0_interval`
 //' returns the value of `interval`.
 //' @export
 //'
 //' @examples
-//' snd <- tuneR::readWave('inst/extdata/1.wav')
+//' file <- file.path(system.file('extdata', package = 'reapeR'), '1.wav')
+//' snd <- tuneR::readWave(file)
 //' results <- reaper_wrap(snd@left, snd@samp.rate)
+//'
 
 #include <Rcpp.h>
 #include "epoch_tracker/epoch_tracker.h"
@@ -42,42 +44,7 @@ using namespace Rcpp;
 #include <unistd.h>
 #endif
 
-class StdoutSilencer {
-public:
-  StdoutSilencer(bool silence) : active_(false), old_fd_(-1) {
-    if (!silence) return;
-
-    fflush(stdout);
-
-#ifdef _WIN32
-    old_fd_ = _dup(_fileno(stdout));
-    freopen("NUL", "w", stdout);
-#else
-    old_fd_ = dup(fileno(stdout));
-    freopen("/dev/null", "w", stdout);
-#endif
-
-    active_ = true;
-  }
-
-  ~StdoutSilencer() {
-    if (!active_) return;
-
-    fflush(stdout);
-
-#ifdef _WIN32
-    _dup2(old_fd_, _fileno(stdout));
-    _close(old_fd_);
-#else
-    dup2(old_fd_, fileno(stdout));
-    close(old_fd_);
-#endif
-  }
-
-private:
-  bool active_;
-  int old_fd_;
-};
+bool r_verbose = false;
 
 // [[Rcpp::export]]
 List reaper_wrap(IntegerVector samples,
@@ -91,7 +58,7 @@ List reaper_wrap(IntegerVector samples,
                  double unvoiced_pulse_interval = 0.01,
                  bool verbose = false) {
 
-  StdoutSilencer silence(!verbose);
+  r_verbose = verbose;
 
   EpochTracker tracker;
 
@@ -157,15 +124,26 @@ List reaper_wrap(IntegerVector samples,
       stop("EpochTracker::ResampleAndReturnResults failed");
   }
 
-  if (verbose) {
-    fflush(stdout);
-  }
+  Diagnostics d = tracker.GetDiagnostics();
 
   return List::create(
     _["epochs"] = epoch_times,
     _["voicing"] = voicing,
     _["f0"] = f0,
     _["correlation"] = correlations,
-    _["f0_interval"] = interval
+    _["f0_interval"] = interval,
+    _["signal"] = d.signal,
+    _["residual"] = d.residual,
+    _["norm_residual"] = d.norm_residual,
+    _["bandpassed_rms"] = d.bandpassed_rms,
+    _["voice_onset_prob"] = d.voice_onset_prob,
+    _["voice_offset_prob"] = d.voice_offset_prob,
+    _["peaks_debug"] = d.peaks_debug,
+    _["prob_voiced"] = d.prob_voiced,
+    _["best_corr"] = d.best_corr,
+    _["f0_time"] = d.f0_time,
+    _["f0_diag"] = d.f0_diag,
+    _["nccf"] = d.nccf,
+    _["voiced_diag"] = d.voiced_diag
   );
 }

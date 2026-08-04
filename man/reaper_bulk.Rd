@@ -12,6 +12,8 @@ reaper_bulk(
   hirst2pass = FALSE,
   praat_output = FALSE,
   praat_output_dir = NULL,
+  hirst2pass_f0min = 60,
+  hirst2pass_f0max = 700,
   ...
 )
 }
@@ -20,8 +22,18 @@ reaper_bulk(
 should be processed. Alternatively the handle of a loaded EMU database.}
 
 \item{output}{String or vector of strings specifying which estimates to
-output. Possible values are `pitch` and `epochs`, default is to output
-both.}
+output. Default is to output `pitch` and `epochs`. Possible values are:
+* `pitch` Returning a data frame with equidistant pitch estimates at
+intervals determined by `interval`.
+* `epochs` returning a named list with a numeric vector specifying the times
+of estimated glottal closure instants.
+* `gci_cand` Returning a data frame with times that are candidate glottal
+closure instants, as well as their time, local pitch value if determined
+to be voiced, and normalized cross-correlation functions (`nccf`).
+* `probs` Returning a data frame with pseudo-probabilities of voicing,
+voicing onset, and voicing offset at regular intervals, as well as bandpassed
+(low-frequency) root-mean-squared amplitude of the signal, which is used to
+derive the pseudo-probability of voicing.}
 
 \item{f0min}{Numeric value specifying pitch floor. Default is `40`.}
 
@@ -42,23 +54,17 @@ session.}
 \item{praat_output_dir}{String giving the location of a directory where
 Praat `.Pitch` files should be stored. Default is `NULL`.}
 
+\item{hirst2pass_f0min}{Numeric giving the pitch floor in Hz for the first
+pass in a two-pass procedure. Default is `60`.}
+
+\item{hirst2pass_f0max}{Numeric giving the pitch ceiling in Hz for the first
+pass in a two-pass procedure. Default is `700`.}
+
 \item{...}{Further arguments passed on to `reaper()`.}
 }
 \value{
-If `output = 'pitch'`, returns a data frame with four columns:
-* `time`, giving the frame time in seconds
-* `voiced` Boolean specifying whether that frame is `voiced`
-* `f0` F0 in Hz
-* `file` String giving the name of the analyzed file.
-
-If `directory` refers to an EMU database, furthermore contains the columns
-`session` and `bundle`.
-
-If `output = 'epochs'`, returns a numeric vector of epochs, or glottal
-closure instants.
-
-If `output = c('pitch', 'epochs')`, returns a list with the above two
-outputs.
+Depending on the value of `output`, either a nested list of outputs,
+a data frame, or a numeric vector.
 }
 \description{
 Wrapper function to call David Talkin's REAPER software on all WAV files
